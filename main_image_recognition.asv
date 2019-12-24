@@ -1,0 +1,4 @@
+function [outputArg1,outputArg2] = main_image_recognition(gray_img_filename, noise_type, )
+    
+end
+
