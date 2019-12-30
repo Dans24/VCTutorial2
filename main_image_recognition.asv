@@ -9,6 +9,11 @@ function [segmented_image, segmented_image_noise, SNR, original_image, histogram
     % Original Image
     I = original_image;
     n = 1;
+    %{
+    fprintf("0 -> Sem ruído\n");
+    fprintf("1 -> Salt-and-pepper\n");
+    fprintf("2 -> Gaussian\n");
+    %}
     coinRadii = input('Raio da moeda (px): '); % 200 425 500
     % 200 425 500
     sensitivity = input('Sensibilidade (%): ') / 100; % 0.92 0.925 0.925
@@ -26,8 +31,8 @@ function [segmented_image, segmented_image_noise, SNR, original_image, histogram
     %imshow(E);
     %figure;
     % Histogram Equalization / Normalization
-    if strcmp(input('Remover sombra (y/n): ', 's'), 'y')
-        I = imtophat(I, strel('disk', input('Tamanho do filtro (px): ' )));
+    if input('Remover sombra (y/n): ') == 'y'
+        I = imtophat(I, strel('disk', input('Tamanho do filtro (px): ' ));
         I = adapthisteq(I);
     end
     %I= histeq(I);
