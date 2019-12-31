@@ -4,10 +4,16 @@ function [segmented_image, segmented_image_noise, SNR, original_image, histogram
     % Introduce Noise
     noise_img = noise_gen(original_image, noise_type, noise_params);
     SNR = 10 * log10(var(original_image(:)) / var(noise_img(:)));
+    fprintf('SNR da imagem com ruído: %f dB\n', SNR);
     % Process Image
     % filtering methods, contrast equalization, normalization, among other techniques
-    % Original Image
-    I = original_image;
+    if strcmp(noise_type, 'salt & pepper')
+        I = smoothspacial(noise_img, 'median', [3 3]);
+    else
+        I = smoothspacial(noise_img, 'gaussian', [3, noise_params(2)]);
+    end
+    figure;
+    imshow(I);
     n = 1;
     coinRadii = input('Raio da moeda (px): '); % 200 425 500
     % 200 425 500
@@ -50,6 +56,9 @@ function [segmented_image, segmented_image_noise, SNR, original_image, histogram
     centers = centers * n;
     radii = radii * n;
     imshow(original_image);
+    viscircles(centers, radii, 'EdgeColor', 'b');
+    figure;
+    imshow(noise_img);
     viscircles(centers, radii, 'EdgeColor', 'b');
     
     % segmenting all of the coins in the image

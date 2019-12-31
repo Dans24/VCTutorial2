@@ -9,14 +9,6 @@ function image_recognition(image)
     fprintf("2 -> Gaussian\n");
     noiseInput = input('Tipo de ruído: ');
     if noiseInput == 1
-        d = input('Densidade do ruído (%): ');
-        if isempty(d)
-            d = 0.05;
-        else
-            d = d / 100;
-        end
-        main_image_recognition(gray_name, 'salt & pepper', d);
-    elseif noiseInput == 2
         m = input('Média do ruído: ');
         if isempty(m)
            m = 0;
@@ -26,7 +18,12 @@ function image_recognition(image)
             var = 0.01;
         end
         main_image_recognition(gray_name, 'gaussian', [m, var]);
-    else
-        error('Comando inválido');
+    else if noiseInput == 2
+        d = input('Densidade do ruído: ');
+        if isempty(d)
+            d = 0.05;
+        end
+        main_image_recognition(gray_name, 'salt & pepper', d);
     end
+    main_image_recognition(gray_name, 'gaussian', [0, 0]);
 end
