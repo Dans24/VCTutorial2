@@ -4,16 +4,17 @@ function [segmented_image, segmented_image_noise, SNR, original_image, histogram
     % Introduce Noise
     noise_img = noise_gen(original_image, noise_type, noise_params);
     SNR = 10 * log10(var(original_image(:)) / var(noise_img(:)));
-    fprintf('SNR da imagem com ruído: %f dB\n', SNR);
+    fprintf('SNR da imagem com ruÃ­do: %f dB\n', SNR);
+    
+    figure("Name", "With Noise"); imshow(noise_img);
     % Process Image
     % filtering methods, contrast equalization, normalization, among other techniques
     if strcmp(noise_type, 'salt & pepper')
         I = smoothspacial(noise_img, 'median', [3 3]);
     else
-        I = smoothspacial(noise_img, 'gaussian', [3, noise_params(2)]);
+        I = smoothspacial(noise_img, 'gaussian', [6, noise_params(2)]);
     end
-    figure;
-    imshow(I);
+    figure("Name", "Without Noise"); imshow(I);
     n = 1;
     coinRadii = input('Raio da moeda (px): '); % 200 425 500
     % 200 425 500
@@ -25,10 +26,8 @@ function [segmented_image, segmented_image_noise, SNR, original_image, histogram
         I = impyramid(I, 'reduce');
         n = n * 2;
     end
-    %imshow(I);
-    %figure;
     % Smooth
-    %E = smoothspacial(noise_img, "gaussian", [3 0.25]);
+    E = smoothspacial(I, "gaussian", [3 0.25]);
     %imshow(E);
     %figure;
     % Histogram Equalization / Normalization
@@ -36,41 +35,38 @@ function [segmented_image, segmented_image_noise, SNR, original_image, histogram
         I = imtophat(I, strel('disk', input('Tamanho do filtro (px): ' )));
         I = adapthisteq(I);
     end
-    %I= histeq(I);
-    %I= imadjust(E);
-    imshow(I);
-    figure;
+    I= histeq(I);
+    I= imadjust(E);
+    figure("Name", "With(out) shadow"); imshow(I);
     % Threshold
-    %T = adaptthresh(E,0.5,'ForegroundPolarity','dark');
-    %I= imbinarize(E,T);
-    %imshow(E);
-    %figure;
-    %imshow(M);
-    %figure;
+    T = adaptthresh(E,0.5,'ForegroundPolarity','dark');
+    I= imbinarize(E,T);
+    figure("Name", "With threshold"); imshow(E);
+
     % Edge detection
     I = edge(I, 'canny', canny_threshold);
-    imshow(I);
-    figure;
+    figure("Name", "Canny Edge"); imshow(I);
+    
     RRange = [50 150];
     [centers, radii] = imfindcircles(I, RRange, 'Sensitivity', sensitivity);
     centers = centers * n;
     radii = radii * n;
-    imshow(original_image);
+    figure("Name", "Original Image"); imshow(original_image);
     viscircles(centers, radii, 'EdgeColor', 'b');
-    figure;
-    imshow(noise_img);
+    figure("Name", "Circles found"); imshow(noise_img);
     viscircles(centers, radii, 'EdgeColor', 'b');
     
-    % segmenting all of the coins in the image
-    
+    % segmenting all of the coins in the image    
     segmented_image = [];
     segmented_image_noise = [];
-    % final segmentation result
+
     
-    % count number of coins
-    
+    % count number of coins    
     number = size(centers);
+    fprintf("Number of coins: %d\n", number(1));
+    
     % histogram showing the distribution of object sizes
-    histogram = [];
+    figure("Name", "Radius Histogram"); hist(radii);
+    h = hist(radii);
 end
 
